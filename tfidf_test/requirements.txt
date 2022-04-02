@@ -1,0 +1,5 @@
+pandas
+jupyterlab
+sklearn
+umap-learn
+matplotlib
