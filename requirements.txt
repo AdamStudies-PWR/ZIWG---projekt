@@ -1,3 +1,4 @@
 sklearn
 umap-learn
+alive_progress
 numpy==1.21
