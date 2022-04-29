@@ -1,2 +1,7 @@
+#enviromnet
 venv
 .idea
+.code
+
+#output
+umap_vectors.txt

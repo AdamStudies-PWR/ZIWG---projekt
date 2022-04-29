@@ -1,5 +1,3 @@
-pandas
-jupyterlab
 sklearn
 umap-learn
-matplotlib
+numpy==1.21

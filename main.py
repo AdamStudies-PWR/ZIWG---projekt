@@ -1,6 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from umap import UMAP
-import os, sys
+import sys
 import json
 
 class DocWithMetadata:
