@@ -1,5 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
+from alive_progress import alive_bar
 from umap import UMAP
+
 import sys
 import json
 
@@ -9,6 +11,7 @@ class DocWithMetadata:
         self.date = date
         self.tags = tags
         self.text = text
+
 
 # Read script args
 docs_path = sys.argv[1]
@@ -23,20 +26,22 @@ metadate_file.close()
 docs = []
 docs_with_metadata = []
 
-for data in metadata:
-    try:
-        doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf8')
-        doc = doc_file.read()
-        docs.append(doc)
+with alive_bar(len(metadata)) as bar:
+    for data in metadata:
+        try:
+            doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf8')
+            doc = doc_file.read()
+            docs.append(doc)
 
-        doc_title = data['title'] if 'title' in data else 'Unknown'
-        doc_date = data['date'] if 'date' in data else 'Unknown'
-        doc_tags = data['key'] if 'key' in data else ['Untagged']
+            doc_title = data['title'] if 'title' in data else 'Unknown'
+            doc_date = data['date'] if 'date' in data else 'Unknown'
+            doc_tags = data['key'] if 'key' in data else ['Untagged']
 
-        docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
-        doc_file.close()
-    except:
-        pass
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
+            doc_file.close()
+            bar()
+        except:
+            pass
 
 # Perform tf idf on loaded documents
 tf_idf_result = TfidfVectorizer().fit_transform(docs)
