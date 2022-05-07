@@ -1,4 +1,5 @@
 sklearn
 umap-learn
 alive_progress
+morfeusz2
 numpy==1.21
