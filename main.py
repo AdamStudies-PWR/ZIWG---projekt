@@ -82,7 +82,6 @@ blacklist = []
 if os.path.exists('blacklist.txt'):
     with open('blacklist.txt', 'r',) as file:
         blacklist = file.read().splitlines()
-print(blacklist)
 
 # Read documents from files by metadata and combine them with metadata
 docs = []
