@@ -26,3 +26,9 @@ python3 -m venv venv/
 ```
 pip3 install -r requirements.txt
 ```
+
+Przygotowanie wykresu
+
+```
+python3 -m frontend.py <umap_vectors_file>
+```
