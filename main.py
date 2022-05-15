@@ -17,15 +17,15 @@ class DocWithMetadata:
         self.tags = tags
         self.text = text
 
-def morf_text(text):
+def morf_text(text, blacklist):
     # Remove all invalid utf-8 characters from string
     text = text.replace('�', '')
     out = ""
     analysis = morf.analyse(text)
-
+    
     word = 0
     for i in range(len(analysis)):
-        if word == analysis[i][0]:
+        if word == analysis[i][0] and analysis[i][2][1] not in blacklist:
             try:
                 out = out + str(analysis[i][2][1]).split(':')[0] + " "
             except:
@@ -77,6 +77,13 @@ metadate_file = open(metadata_path, 'r', encoding='utf-8')
 metadata = json.load(metadate_file)
 metadate_file.close()
 
+# Read blacklisted words
+blacklist = []
+if os.path.exists('blacklist.txt'):
+    with open('blacklist.txt', 'r',) as file:
+        blacklist = file.read().splitlines()
+print(blacklist)
+
 # Read documents from files by metadata and combine them with metadata
 docs = []
 docs_with_metadata = []
@@ -89,7 +96,7 @@ with alive_bar(len(metadata)) as bar:
             doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf-8')
             
             if should_morf_text:
-                doc = morf_text(doc_file.read())
+                doc = morf_text(doc_file.read(), blacklist)
             else:
                 doc = doc_file.read()
 
