@@ -1,7 +1,14 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
+from alive_progress import alive_bar
 from umap import UMAP
+
+import morfeusz2 as morfeusz
+
+import os
 import sys
+
 import json
+
 
 class DocWithMetadata:
     def __init__(self, title, date, tags, text):
@@ -10,9 +17,60 @@ class DocWithMetadata:
         self.tags = tags
         self.text = text
 
-# Read script args
-docs_path = sys.argv[1]
-metadata_path = sys.argv[2]
+def morf_text(text):
+    # Remove all invalid utf-8 characters from string
+    text = text.replace('�', '')
+    out = ""
+    analysis = morf.analyse(text)
+
+    word = 0
+    for i in range(len(analysis)):
+        if word == analysis[i][0]:
+            try:
+                out = out + str(analysis[i][2][1]).split(':')[0] + " "
+            except:
+                print("Error 2: Error analysing data")
+            word = word + 1
+
+    return out
+
+
+# Set up arguments
+docs_path = None
+metadata_path = None
+should_morf_text = True
+
+
+def switch_args(arg):
+    if arg == "no_morph":
+        global should_morf_text
+        should_morf_text = False
+    else:
+        print("Unrecognized argument! Ignoring.")
+
+def switch_short_args(arg):
+    if arg == "nm":
+        global should_morf_text
+        should_morf_text = False
+    else:
+        print("Unrecognized argument! Ignoring.")
+
+# Set up tools
+morf = morfeusz.Morfeusz()
+
+
+args = sys.argv
+args.pop(0)
+for arg in args:
+    if arg.startswith('--'):
+        switch_args(arg[2:])
+    elif arg.startswith('-'):
+        switch_short_args(arg[1:])
+    else:
+        if docs_path is None:
+            docs_path = arg
+        else:
+            metadata_path = arg
 
 # Read metadata from file
 metadate_file = open(metadata_path, 'r', encoding='utf-8')
@@ -23,20 +81,30 @@ metadate_file.close()
 docs = []
 docs_with_metadata = []
 
-for data in metadata:
-    try:
-        doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf8')
-        doc = doc_file.read()
-        docs.append(doc)
+print("Loadnig data...")
+with alive_bar(len(metadata)) as bar:
+    for data in metadata:
+        try:
+            bar()
+            doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf-8')
+            
+            if should_morf_text:
+                doc = morf_text(doc_file.read())
+            else:
+                doc = doc_file.read()
 
-        doc_title = data['title'] if 'title' in data else 'Unknown'
-        doc_date = data['date'] if 'date' in data else 'Unknown'
-        doc_tags = data['key'] if 'key' in data else ['Untagged']
+            docs.append(doc)
 
-        docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
-        doc_file.close()
-    except:
-        pass
+            doc_title = data['title'] if 'title' in data else 'Unknown'
+            doc_date = data['date'] if 'date' in data else 'Unknown'
+            doc_tags = data['key'] if 'key' in data else ['Untagged']
+
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
+            doc_file.close()
+        except OSError:
+            print("error 1: Error reading from file")
+        except:
+            print("error 2: Generall error")
 
 # Perform tf idf on loaded documents
 tf_idf_result = TfidfVectorizer().fit_transform(docs)
