@@ -10,6 +10,9 @@ import sys
 import json
 
 
+CHUNKS = 1
+
+
 class DocWithMetadata:
     def __init__(self, title, date, tags, text):
         self.title = title
@@ -33,6 +36,22 @@ def morf_text(text, blacklist):
             word = word + 1
 
     return out
+
+
+def transform_docs(docs, out_file):
+    # Perform tf idf on loaded documents
+    print("dbg-1")
+    tf_idf_result = TfidfVectorizer().fit_transform(docs)
+
+    print("dbg-2")
+    # Perform umap on tf idf result
+    umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_transform(tf_idf_result.toarray())
+
+    print("dbg-3")
+    # Write umap results to file
+    for idx, vector in enumerate(umap_vectors):
+        formatetd_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
+        out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formatetd_doc_title + '\n')
 
 
 # Set up arguments
@@ -87,11 +106,18 @@ if os.path.exists('blacklist.txt'):
 docs = []
 docs_with_metadata = []
 
+chunk = 0
+chunk_size = int(len(metadata)/CHUNKS)
+if os.path.exists('umap_vectors.txt'):
+    os.remove('umap_vectors.txt')
+out_file = open('umap_vectors.txt', 'a', encoding='utf8')
+
 print("Loadnig data...")
+print("Chunk size: " + str(chunk_size))
 with alive_bar(len(metadata)) as bar:
     for data in metadata:
         try:
-            bar()
+            chunk = chunk + 1
             doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf-8')
             
             if should_morf_text:
@@ -107,22 +133,16 @@ with alive_bar(len(metadata)) as bar:
 
             docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
             doc_file.close()
+
+            if chunk == chunk_size:
+                print("Data dump")
+                transform_docs(docs, out_file)
+                chunk = 0
+                docs = []
+
+            bar()
+
         except OSError:
             print("error 1: Error reading from file")
-        except:
-            print("error 2: Generall error")
-
-# Perform tf idf on loaded documents
-tf_idf_result = TfidfVectorizer().fit_transform(docs)
-
-# Perform umap on tf idf result
-umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_transform(tf_idf_result.toarray())
-
-# Write umap results to file
-out_file = open('umap_vectors.txt', 'w', encoding='utf8')
-
-for idx, vector in enumerate(umap_vectors):
-    formatetd_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
-    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formatetd_doc_title + '\n')
 
 out_file.close()
