@@ -1,3 +1,12 @@
+wheel
+sklearn
+umap-learn
+alive_progress
+morfeusz2
 numpy==1.21
 pandas==1.4.2
 plotly
+python-dateutil==2.8.2
+pytz==2022.1
+six==1.16.0
+tenacity==8.0.1
