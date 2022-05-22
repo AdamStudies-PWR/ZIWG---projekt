@@ -8,6 +8,7 @@ inny
 temu
 kto
 gdzie
+#wieszwiecej
 czego
 jaki
 kto
