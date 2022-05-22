@@ -11,10 +11,11 @@ import json
 
 
 class DocWithMetadata:
-    def __init__(self, title, date, tags, text):
+    def __init__(self, title, date, tags, source, text):
         self.title = title
         self.date = date
         self.tags = tags
+        self.source = source
         self.text = text
 
 def morf_text(text, blacklist):
@@ -104,8 +105,14 @@ with alive_bar(len(metadata)) as bar:
             doc_title = data['title'] if 'title' in data else 'Unknown'
             doc_date = data['date'] if 'date' in data else 'Unknown'
             doc_tags = data['key'] if 'key' in data else ['Untagged']
+            if 'source' in data:
+                doc_src = data['source']
+            elif 'src' in data:
+                doc_src = data['src']
+            else:
+                doc_src = 'Unknown'
 
-            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc))
             doc_file.close()
         except OSError:
             print("error 1: Error reading from file")
@@ -122,7 +129,9 @@ umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_trans
 out_file = open('umap_vectors.txt', 'w', encoding='utf8')
 
 for idx, vector in enumerate(umap_vectors):
-    formatetd_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
-    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formatetd_doc_title + '\n')
+    formated_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
+    formated_doc_source = docs_with_metadata[idx].source.replace('\t', '   ').replace('\n', ' ')
+    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formated_doc_title + '\t' + formated_doc_source + '\t' + 
+                   str(docs_with_metadata[idx].tags) + '\n')
 
 out_file.close()
