@@ -11,21 +11,22 @@ import json
 
 
 class DocWithMetadata:
-    def __init__(self, title, date, tags, text):
+    def __init__(self, title, date, tags, source, text):
         self.title = title
         self.date = date
         self.tags = tags
+        self.source = source
         self.text = text
 
-def morf_text(text):
+def morf_text(text, blacklist):
     # Remove all invalid utf-8 characters from string
     text = text.replace('�', '')
     out = ""
     analysis = morf.analyse(text)
-
+    
     word = 0
     for i in range(len(analysis)):
-        if word == analysis[i][0]:
+        if word == analysis[i][0] and analysis[i][2][1] not in blacklist:
             try:
                 out = out + str(analysis[i][2][1]).split(':')[0] + " "
             except:
@@ -77,6 +78,12 @@ metadate_file = open(metadata_path, 'r', encoding='utf-8')
 metadata = json.load(metadate_file)
 metadate_file.close()
 
+# Read blacklisted words
+blacklist = []
+if os.path.exists('blacklist.txt'):
+    with open('blacklist.txt', 'r',) as file:
+        blacklist = file.read().splitlines()
+
 # Read documents from files by metadata and combine them with metadata
 docs = []
 docs_with_metadata = []
@@ -89,7 +96,7 @@ with alive_bar(len(metadata)) as bar:
             doc_file = open(docs_path + '/' + data['id'] + '.txt', 'r', encoding='utf-8')
             
             if should_morf_text:
-                doc = morf_text(doc_file.read())
+                doc = morf_text(doc_file.read(), blacklist)
             else:
                 doc = doc_file.read()
 
@@ -98,8 +105,14 @@ with alive_bar(len(metadata)) as bar:
             doc_title = data['title'] if 'title' in data else 'Unknown'
             doc_date = data['date'] if 'date' in data else 'Unknown'
             doc_tags = data['key'] if 'key' in data else ['Untagged']
+            if 'source' in data:
+                doc_src = data['source']
+            elif 'src' in data:
+                doc_src = data['src']
+            else:
+                doc_src = 'Unknown'
 
-            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc))
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc))
             doc_file.close()
         except OSError:
             print("error 1: Error reading from file")
@@ -116,7 +129,9 @@ umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_trans
 out_file = open('umap_vectors.txt', 'w', encoding='utf8')
 
 for idx, vector in enumerate(umap_vectors):
-    formatetd_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
-    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formatetd_doc_title + '\n')
+    formated_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
+    formated_doc_source = docs_with_metadata[idx].source.replace('\t', '   ').replace('\n', ' ')
+    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formated_doc_title + '\t' + formated_doc_source + '\t' + 
+                   str(docs_with_metadata[idx].tags) + '\n')
 
 out_file.close()
