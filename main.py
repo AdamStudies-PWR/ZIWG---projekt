@@ -131,6 +131,7 @@ out_file = open('umap_vectors.txt', 'w', encoding='utf8')
 for idx, vector in enumerate(umap_vectors):
     formated_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
     formated_doc_source = docs_with_metadata[idx].source.replace('\t', '   ').replace('\n', ' ')
-    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formated_doc_title + '\t' + formated_doc_source + '\n')
+    out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formated_doc_title + '\t' + formated_doc_source + '\t' + 
+                   str(docs_with_metadata[idx].tags) + '\n')
 
 out_file.close()
