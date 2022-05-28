@@ -123,7 +123,7 @@ with alive_bar(len(metadata)) as bar:
 tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
 
 # Perform umap on tf idf result
-umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_transform(tf_idf_result.toarray())
+umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
 
 # Write umap results to file
 out_file = open('umap_vectors.txt', 'w', encoding='utf8')
