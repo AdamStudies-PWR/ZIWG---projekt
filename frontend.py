@@ -15,7 +15,7 @@ class TracedObject:
 traced_sources = {}
 traced_tags = {}
 
-with open(sys.argv[1], newline='') as umap_vectors:
+with open(sys.argv[1], newline='', encoding='utf8') as umap_vectors:
     csv_reader = csv.reader(umap_vectors, delimiter='\t')
     for row in csv_reader:
         tags = row[4].replace('[', '').replace(']', '').replace('\'', '').lower()

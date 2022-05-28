@@ -120,7 +120,7 @@ with alive_bar(len(metadata)) as bar:
             print("error 2: Generall error")
 
 # Perform tf idf on loaded documents
-tf_idf_result = TfidfVectorizer().fit_transform(docs)
+tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
 
 # Perform umap on tf idf result
 umap_vectors = UMAP(n_neighbors=2, min_dist=0.3, metric='correlation').fit_transform(tf_idf_result.toarray())
