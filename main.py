@@ -1,4 +1,12 @@
+from numpy import append
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+import numpy as np
+
+import fasttext
+import fasttext.util
+
+
 from alive_progress import alive_bar
 from umap import UMAP
 
@@ -120,10 +128,28 @@ with alive_bar(len(metadata)) as bar:
             print("error 2: Generall error")
 
 # Perform tf idf on loaded documents
-tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
+# tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
 
-# Perform umap on tf idf result
-umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
+
+ft = fasttext.load_model('cc.pl.300.bin')
+fasttext.util.reduce_model(ft, 2)
+
+fasttext_results = []
+
+for doc in docs:
+    v=ft.get_sentence_vector(doc)
+    fasttext_results.append(v)
+
+print("Loaded!")
+print(fasttext_results)
+# print(tf_idf_result)
+
+
+# # Perform umap on tf idf result
+# umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
+umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(fasttext_results)
+
+print(umap_vectors)
 
 # Write umap results to file
 out_file = open('umap_vectors.txt', 'w', encoding='utf8')
@@ -135,3 +161,5 @@ for idx, vector in enumerate(umap_vectors):
                    str(docs_with_metadata[idx].tags) + '\n')
 
 out_file.close()
+
+# sortowanie po tagach albo zródłach
