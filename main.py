@@ -132,7 +132,7 @@ with alive_bar(len(metadata)) as bar:
 
 
 ft = fasttext.load_model('cc.pl.300.bin')
-fasttext.util.reduce_model(ft, 2)
+fasttext.util.reduce_model(ft, 1)
 
 fasttext_results = []
 
@@ -147,7 +147,7 @@ print(fasttext_results)
 
 # # Perform umap on tf idf result
 # umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
-umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(fasttext_results)
+umap_vectors = UMAP(n_neighbors=10, min_dist=0.1).fit_transform(fasttext_results)
 
 print(umap_vectors)
 
@@ -161,5 +161,3 @@ for idx, vector in enumerate(umap_vectors):
                    str(docs_with_metadata[idx].tags) + '\n')
 
 out_file.close()
-
-# sortowanie po tagach albo zródłach
