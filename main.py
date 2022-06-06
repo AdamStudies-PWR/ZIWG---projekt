@@ -161,7 +161,7 @@ with alive_bar(len(metadata)) as bar:
             print("error 2: Generall error")
 
 umap_vectors = []
-if use_fastext: 
+if use_fasttext: 
     umap_vectors = fasttext()
 else:
     umap_vectors = tf_idf()
