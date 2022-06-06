@@ -1,11 +1,8 @@
-from numpy import append
+from pickle import FALSE
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-import numpy as np
 
 import fasttext
 import fasttext.util
-
 
 from alive_progress import alive_bar
 from umap import UMAP
@@ -26,6 +23,7 @@ class DocWithMetadata:
         self.source = source
         self.text = text
 
+
 def morf_text(text, blacklist):
     # Remove all invalid utf-8 characters from string
     text = text.replace('�', '')
@@ -44,23 +42,58 @@ def morf_text(text, blacklist):
     return out
 
 
+def fasttext():
+    print("Mode: FastText")
+    ft = fasttext.load_model('cc.pl.300.bin')
+    fasttext.util.reduce_model(ft, 1)
+
+    fasttext_results = []
+
+    for doc in docs:
+        v=ft.get_sentence_vector(doc)
+        fasttext_results.append(v)
+    
+    umap_vectors = UMAP(n_neighbors=10, min_dist=0.1).fit_transform(fasttext_results)
+    return umap_vectors
+
+
+# Perform tf idf on loaded documents
+def tf_idf():
+    print("Mode: Tf_idf")
+    tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
+
+    umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
+    return umap_vectors
+
+
 # Set up arguments
 docs_path = None
 metadata_path = None
 should_morf_text = True
+use_fasttext = False
 
 
 def switch_args(arg):
+    global should_morf_text
+    global use_fasttext
     if arg == "no_morph":
-        global should_morf_text
         should_morf_text = False
+    elif arg == "fasttext":
+        use_fasttext = True
+    elif arg == "tf_idf":
+        use_fasttext = False
     else:
         print("Unrecognized argument! Ignoring.")
 
 def switch_short_args(arg):
+    global should_morf_text
+    global use_fasttext
     if arg == "nm":
-        global should_morf_text
         should_morf_text = False
+    elif arg == "ft":
+        use_fasttext = True
+    elif arg == "ti":
+        use_fasttext = False
     else:
         print("Unrecognized argument! Ignoring.")
 
@@ -127,29 +160,14 @@ with alive_bar(len(metadata)) as bar:
         except:
             print("error 2: Generall error")
 
-# Perform tf idf on loaded documents
-# tf_idf_result = TfidfVectorizer(min_df=0.05, max_df=0.95).fit_transform(docs)
-
-
-ft = fasttext.load_model('cc.pl.300.bin')
-fasttext.util.reduce_model(ft, 1)
-
-fasttext_results = []
-
-for doc in docs:
-    v=ft.get_sentence_vector(doc)
-    fasttext_results.append(v)
+umap_vectors = []
+if use_fastext: 
+    umap_vectors = fasttext()
+else:
+    umap_vectors = tf_idf()
 
 print("Loaded!")
-print(fasttext_results)
-# print(tf_idf_result)
-
-
-# # Perform umap on tf idf result
-# umap_vectors = UMAP(n_neighbors=10, min_dist=0.1, metric='correlation').fit_transform(tf_idf_result.toarray())
-umap_vectors = UMAP(n_neighbors=10, min_dist=0.1).fit_transform(fasttext_results)
-
-print(umap_vectors)
+# print(umap_vectors)
 
 # Write umap results to file
 out_file = open('umap_vectors.txt', 'w', encoding='utf8')
