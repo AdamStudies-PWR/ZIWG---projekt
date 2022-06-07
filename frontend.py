@@ -1,3 +1,4 @@
+from asyncio.trsock import _Address
 import csv
 import sys
 
@@ -54,5 +55,5 @@ for tag in traced_tags:
         name=traced_tags[tag].name))
 
 
-print(fig.show())
-print(fig2.show())
+fig.show()
+fig2.show()
