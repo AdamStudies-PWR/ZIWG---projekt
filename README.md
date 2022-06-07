@@ -22,6 +22,7 @@ python3 -m venv venv/
 ```
 pip3 install -r requirements.txt
 ```
+Dodatkowo dla metody FastText konieczne jest pobranie modelu bin dla języka polskiego ze strony [projektu fasttext](https://fasttext.cc/docs/en/crawl-vectors.html)
 
 ### Przygotowanie danych
 
@@ -30,7 +31,7 @@ pip3 install -r requirements.txt
 2. Plik Json zawierający metadane dla artykułów. Powinien on zawierać następujące pola:
 * `id`: Identyfikator, taki sam jak nazwa pliku `.txt` zawierającoego dany tekst.
 * `title`: Tytuł tekstu.
-* `date`: Data publikacji\\utowrzenia danego tekstu.
+* `date`: Data publikacji\\utworzenia danego tekstu.
 * `key`: Lista dodatkowych tagów opisujących dany tekst.
 * `source`\\`src`: Źródło\\autor danego tekstu.
 
@@ -44,10 +45,10 @@ Każde z powższych pól jest opcjonalne.
 python3 main.py [options] <path_to_folder_with_articles> <json_describing_loaded_articles>
 ```
 
-Options are:
-* `--no_morph` (`-nm`): Do not use morpheus2 text simplification tool.
-* `--fasttext` (`-ft`): Use fasttext text analysis.
-* `--tf_idf` (`-ti`): Use tf_idf text analysis.
+Dostępne opcje:
+* `--no_morph` (`-nm`): Nie używaj narzędzia morpheus2 do uproszczenia tekstu wejściowego.
+* `--fasttext` (`-ft`): Użyj metody TastText.
+* `--tf_idf` (`-ti`): Użyj metody Tf_Idf.
 
 
 2. Wyświetlenie wykresów
