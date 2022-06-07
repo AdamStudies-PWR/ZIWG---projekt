@@ -3,6 +3,7 @@ sklearn
 umap-learn
 alive_progress
 morfeusz2
+fasttext
 numpy
 pandas==1.4.2
 plotly
