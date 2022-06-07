@@ -54,5 +54,5 @@ for tag in traced_tags:
         name=traced_tags[tag].name))
 
 
-fig.show()
-fig2.show()
+print(fig.show())
+print(fig2.show())

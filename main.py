@@ -1,27 +1,23 @@
-from pickle import FALSE
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-import fasttext
-import fasttext.util
-
 from alive_progress import alive_bar
 from umap import UMAP
+
+import fasttext
 
 import morfeusz2 as morfeusz
 
 import os
 import sys
-
 import json
 
+
 class DocWithMetadata:
-    def __init__(self, title, date, tags, source, file_name, text):
+    def __init__(self, title, date, tags, source, file_name):
         self.title = title
         self.date = date
         self.tags = tags
         self.source = source
         self.file_name = file_name
-        self.text = text
 
 
 def morf_text(text, blacklist):
@@ -153,7 +149,7 @@ with alive_bar(len(metadata)) as bar:
             else:
                 doc_src = 'Unknown'
 
-            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc_file_name, doc))
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc_file_name))
             doc_file.close()
         except OSError:
             print("error 1: Error reading from file")

@@ -2,6 +2,8 @@
 venv
 .idea
 .code
+
+#fasttext model
 cc.pl.300.bin
 
 #output
