@@ -14,13 +14,13 @@ import sys
 
 import json
 
-
 class DocWithMetadata:
-    def __init__(self, title, date, tags, source, text):
+    def __init__(self, title, date, tags, source, file_name, text):
         self.title = title
         self.date = date
         self.tags = tags
         self.source = source
+        self.file_name = file_name
         self.text = text
 
 
@@ -42,11 +42,10 @@ def morf_text(text, blacklist):
     return out
 
 
-def fasttext():
+def fast_text():
     print("Mode: FastText")
     ft = fasttext.load_model('cc.pl.300.bin')
-    fasttext.util.reduce_model(ft, 1)
-
+    
     fasttext_results = []
 
     for doc in docs:
@@ -146,6 +145,7 @@ with alive_bar(len(metadata)) as bar:
             doc_title = data['title'] if 'title' in data else 'Unknown'
             doc_date = data['date'] if 'date' in data else 'Unknown'
             doc_tags = data['key'] if 'key' in data else ['Untagged']
+            doc_file_name = data['id'] + '.txt'
             if 'source' in data:
                 doc_src = data['source']
             elif 'src' in data:
@@ -153,7 +153,7 @@ with alive_bar(len(metadata)) as bar:
             else:
                 doc_src = 'Unknown'
 
-            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc))
+            docs_with_metadata.append(DocWithMetadata(doc_title, doc_date, doc_tags, doc_src, doc_file_name, doc))
             doc_file.close()
         except OSError:
             print("error 1: Error reading from file")
@@ -162,7 +162,7 @@ with alive_bar(len(metadata)) as bar:
 
 umap_vectors = []
 if use_fasttext: 
-    umap_vectors = fasttext()
+    umap_vectors = fast_text()
 else:
     umap_vectors = tf_idf()
 
@@ -176,6 +176,6 @@ for idx, vector in enumerate(umap_vectors):
     formated_doc_title = docs_with_metadata[idx].title.replace('\t', '   ').replace('\n', ' ')
     formated_doc_source = docs_with_metadata[idx].source.replace('\t', '   ').replace('\n', ' ')
     out_file.write(str(vector[0]) + '\t' + str(vector[1]) + '\t' + formated_doc_title + '\t' + formated_doc_source + '\t' + 
-                   str(docs_with_metadata[idx].tags) + '\n')
+                   str(docs_with_metadata[idx].tags) + '\t' + docs_with_metadata[idx].file_name + '\n')
 
 out_file.close()

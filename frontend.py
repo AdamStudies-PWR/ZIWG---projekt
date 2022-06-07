@@ -25,14 +25,14 @@ with open(sys.argv[1], newline='', encoding='utf8') as umap_vectors:
             if tag in traced_tags:
                 traced_tags[tag].x.append(float(row[0]))
                 traced_tags[tag].y.append(float(row[1]))
-                traced_tags[tag].title.append(row[2])
+                traced_tags[tag].title.append(row[2] + ' (' + row[5] + ')')
             else:
                 traced_tags[tag] = TracedObject(tag, [float(row[0])], [float(row[1])], [row[2]])
 
         if row[3] in traced_sources:
             traced_sources[row[3]].x.append(float(row[0]))
             traced_sources[row[3]].y.append(float(row[1]))
-            traced_sources[row[3]].title.append(row[2])
+            traced_sources[row[3]].title.append(row[2] + ' (' + row[5] + ')')
         else:
             traced_sources[row[3]] = TracedObject(row[3], [float(row[0])], [float(row[1])], [row[2]])
 
