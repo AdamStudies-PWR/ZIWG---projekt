@@ -2,7 +2,6 @@ wheel
 sklearn
 umap-learn
 alive_progress
-morfeusz2
 fasttext
 numpy
 pandas==1.4.2
@@ -11,3 +10,6 @@ python-dateutil==2.8.2
 pytz==2022.1
 six==1.16.0
 tenacity==8.0.1
+fasttext
+flask
+flask_cors
