@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<body style="min-height: 100vh">
+<div id='chart1' class='chart' style="min-height: 100vh"></div>
+<div id='chart2' class='chart' style="min-height: 100vh"></div>
+</body>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>-->
+<script type='text/javascript'>
+  var graphs = {{graphJSON | safe}};
+  Plotly.plot('chart1',graphs,{});
+</script>
+<script type='text/javascript'>
+    var graphs = {{graphJSON2 | safe}};
+    Plotly.plot('chart2',graphs,{});
+</script>
+</html>

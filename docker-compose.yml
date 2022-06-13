@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  ziwg:
+    container_name: ziwg
+    entrypoint: /bin/bash
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    ports:
+      - "5000:5000"
+    build:
+      context: .
+    volumes:
+      - ./:/app/

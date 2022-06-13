@@ -37,7 +37,7 @@ Dodatkowo dla metody FastText konieczne jest pobranie modelu bin dla języka pol
 
 Każde z powższych pól jest opcjonalne.
 
-### Uruchumienie aplikcji
+### Uruchomienie aplikcji
 
 1. Przetworzenie danych
 
@@ -56,3 +56,19 @@ Dostępne opcje:
 ```
 python3 frontend.py <umap_vectors_file>
 ```
+
+### Docker
+
+Podwyższy projekt umożliwia uruchomienie go w kontenerze, aby to zrobić należy użyć następującej komendy z poziomu folderu, w którym znajduje się aplikacja:
+
+```
+docker-compose up -d
+```
+
+W celu "wejścia" do kontenera i uruchamiania komend z jego poziomu można użyć komendy:
+
+```
+docker exec -it ziwg bash
+```
+
+Pliki znajdujące się w lokalizacji projektu zostaną przeniesione do kontenera i będą dostępne pod ścieżką /app
